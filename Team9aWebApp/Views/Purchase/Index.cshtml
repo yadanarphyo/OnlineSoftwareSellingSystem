@@ -1,0 +1,127 @@
+﻿@{
+    ViewData["Title"] = "My Purchases";
+    Layout = "_Layout";
+    string cartQty = (string)ViewData["CartQty"];
+
+
+
+    List<string> prodNameList = ViewBag.prodName;
+    List<string> actCodeList = ViewBag.actCode;
+    List<DateTime> dateList = ViewBag.date;
+    List<string> imageList = ViewBag.image;
+    List<string> descList = ViewBag.desc;
+
+}
+
+<style type="text/css">
+    .row {
+        width: 100%;
+        height: 370px;
+        margin-top: 10px;
+    }
+
+    .productinfo {
+        width: 250px;
+        height: 360px;
+        margin-left: 250px;
+        background-color: aliceblue;
+    }
+
+    .purchase {
+        width: 500px;
+        height: 200px;
+        margin-top: 80px;
+        margin-left: 30px;
+        float: left;
+    }
+
+    .img {
+        width: 250px;
+        height: 200px;
+        float: left;
+    }
+
+    .name {
+        width: 250px;
+        height: 50px;
+        float: left;
+        margin-top: 10px;
+    }
+
+    .desc {
+        width: 240px;
+        height: 80px;
+        float: left;
+        margin-left: 5px;
+        margin-top: 10px;
+        overflow: auto;
+        background-color: white;
+    }
+
+    p {
+        margin-bottom: 0;
+    }
+
+    tr {
+        height: 45px;
+    }
+
+    #actcode {
+        width: 250px;
+    }
+
+    #combobox {
+        width: 330px;
+    }
+</style>
+
+<div class="text-center">
+    <h1 class="display-4">@ViewData["Title"]</h1>
+</div>
+
+<form>
+    @{
+        for (int i = 0; i < prodNameList.Count(); i++)
+        {
+        string[] codes = actCodeList[i].Split(",");
+
+        <div class="row">
+            <div class="productinfo">
+                <img class="img" src="~/images/@imageList[i]" />
+                <div class="name"><p align="center"><b>@prodNameList[i]</b></p></div>
+                <div class="desc"><p align="center">@descList[i]</p></div>
+            </div>
+            <div class="purchase">
+                <table>
+                    <tr>
+                        <td style="vertical-align:middle"><p align="center">Date:</p></td>
+                        <td style="vertical-align:middle">@dateList[i].Date.ToString("dd/MM/yyy")</td>
+                    </tr>
+                    <tr>
+                        <td style="vertical-align:middle"><p align="center">Qty:</p></td>
+                        <td style="vertical-align:middle"><p>@codes.Length</p></td>
+                    </tr>
+                    <tr>
+
+
+                        <td style="vertical-align:middle"><p align="center">Activation Code:</p></td>
+                        <td style="vertical-align:middle">
+                            <select id="combobox">
+                                @for (int j = 0; j < codes.Length; j++)
+                                {
+                                <option>@codes[j]</option>
+                                }
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" align="center"><input type="button" value="Download" /></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <hr>
+        }
+    }
+</form>
+

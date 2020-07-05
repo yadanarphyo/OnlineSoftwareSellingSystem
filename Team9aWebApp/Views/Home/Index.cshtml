@@ -1,0 +1,96 @@
+﻿@using (Html.BeginForm("Index", "Home", FormMethod.Get))
+{
+    <p>
+
+        @Html.TextBox("id")
+        &nbsp;&nbsp;
+        <input type="submit" value="Search" />
+    </p>
+
+}
+@{
+    ViewData["Title"] = "Product Catalogue";
+    Layout = "_Layout";
+}
+@{
+    var products = (List<Product>)ViewData["ProductData"];
+}
+
+<style type="text/css">
+    .item {
+        width: 820px;
+        height: auto;
+        float: left;
+        margin-left: 170px;
+        margin-top: 50px;
+    }
+
+    .eachproduct {
+        width: 250px;
+        height: 500px;
+        float: left;
+        margin-left: 10px;
+        margin-bottom: 10px;
+        background-color: #F3F8F9;
+    }
+
+    .item img {
+        float: left;
+        height: 250px;
+        width: 250px;
+    }
+
+    .item p {
+        height: 30px;
+        width: 250px;
+        float: left;
+        text-align: center;
+    }
+
+    #name {
+        height: 50px;
+        width: 230px;
+        float: left;
+        text-align: center;
+        margin-left: 10px;
+    }
+
+    #desc {
+        height: 70px;
+        width: 230px;
+        float: left;
+        margin-left: 10px;
+        margin-top: 10px;
+        text-align: center;
+        overflow: auto;
+    }
+
+    #price {
+        height: 30px;
+        width: 230px;
+        float: left;
+        text-align: center;
+    }
+</style>
+
+<div class="text-center">
+    <h1 class="display-4">@ViewData["Title"]</h1>
+</div>
+
+<form id="Editform" action="Home/AddToCart" method="post">
+    <div class="item mb-5">
+
+        @foreach (var product in products)
+        {
+        <div class="eachproduct">
+            <img src="~/images/@product.Image" />
+            <div id="name"><b>@product.ProductName</b></div>
+            <div id="desc">@product.ProductDescription</div>
+            <p id="price"><b>$ @product.UnitPrice</b>
+            <p><input type="button" name="productName" id="@product.ProductName" value="Add to Cart" class="addToCartButton"></p>
+        </div>
+        }
+        <input id="ProdName" name="productName" type="hidden" />
+    </div>
+</form>
+

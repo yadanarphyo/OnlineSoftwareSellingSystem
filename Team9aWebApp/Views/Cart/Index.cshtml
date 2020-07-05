@@ -1,0 +1,164 @@
+﻿
+@{
+    Layout = "_CartLayout";
+    var products = (List<Product>)ViewData["ProductData"];
+    var quantity = (List<int>)ViewData["ProductQty"];
+    var cartTotalPrice = ViewData["CartTotalPrice"];
+    ViewData["Title"] = "Shopping Cart";
+    string session = (string)ViewData["username"];
+}
+
+<style type="text/css">
+    .item {
+        width: 850px;
+        height: auto;
+        float: left;
+        margin-left: 170px;
+        margin-top: 50px;
+    }
+
+    .eachproduct {
+        width: 277px;
+        height: 250px;
+        float: left;
+        margin-left: 10px;
+        margin-bottom: 10px;
+        /*background-color: #F3F8F9;*/
+    }
+
+    .item img {
+        height: 250px;
+        width: 270px;
+    }
+
+    .item p {
+        height: 50px;
+        width: 250px;
+        text-align: center;
+    }
+
+    #desc {
+        height: 70px;
+        width: 230px;
+        margin-left: 10px;
+        text-align: center;
+        overflow: auto;
+    }
+
+    #price {
+        height: 30px;
+        width: 230px;
+        text-align: center;
+    }
+</style>
+
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+<script src=”https://www.paypalobjects.com/api/checkout.js”></script>
+<script src="https://www.paypal.com/sdk/js?client-id=AaO6wk0Nopx_idqWtaWvbT-zdmiyJC7CIJAuREF7WiJxbrUkiTHPB1E0Ew58_FqzfD2KOPNOfw9c_ORG"></script><!-- plz change your own client ID  -->
+<script src="https://www.paypal.com/sdk/js?client-id=sb&components=buttons,funding-eligibility"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+<script>
+    paypal.Buttons({
+        fundingSource: paypal.FUNDING.PAYPAL,
+        createOrder: function (data, actions) {
+            // This function sets up the details of the transaction, including the amount and line item details.
+            return actions.order.create({
+                purchase_units: [{
+                    amount: {
+                        value: @cartTotalPrice ;// pass the order total value
+                    }
+                }]
+            });
+        },
+        onApprove: function (data, actions) {
+            // This function captures the funds from the transaction.
+            //return actions.order.capture().then(function (details) {
+            //    window.location.href = 'http://localhost:44381/Cart/AddCartToPurchasedProduct';
+            //});
+            return actions.order.capture().then(function (details) {
+                var userNameField = document.getElementById("msg");
+                userNameField.click();
+                // This function shows a transaction success message to your buyer.
+                //$('#msg').append('<div class="alert alert-success" role="alert">Transaction completed by' + details.payer.name.given_name + '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>');
+            });
+        }
+    }).render('#paypal-button-container');
+  //This function displays Smart Payment Buttons on your web page.
+</script>
+
+    @if (ViewData.ContainsKey("Message"))
+    {
+        <form id="Cartform" action="Update" method="post">
+            <p>
+                @*<input type="submit" class="updateBtn" id="continueBtn" name="submit" value="Continue Shopping" />*@
+                <div align="center">@ViewData["Message"]</div>
+            </p>
+
+
+        </form>
+    }
+
+@if (ViewData.ContainsKey("Message") == false)
+{
+    <div class="text-center">
+        <h1 class="display-4"></h1>
+    </div>
+    <div style="float:right">
+        <p align="center">
+            <font size="5" color="black">
+                <b>TOTAL:</b> $<input type="button" style="width:auto;text-align:center;font-weight:bold ;border:none;background:content-box" id="totalPrice" value=@cartTotalPrice readonly /><b>.00</b>
+            </font>
+        </p>
+        @{
+            if (@session != null)
+            {
+            <div id="msg" onclick="window.location.href='AddCartToPurchasedProduct'"></div>
+            <div id="paypal-button-container"></div>
+            <br>
+            }
+        }
+    </div>
+
+
+    <form id="Cartform" action="UpdateQty" method="post">
+
+        <table class="item mb-5" border="0" id="mytable">
+
+
+            @{ for (int i = 0; i < @products.Count; i++)
+                {
+                    <tr id="cartTR-@i">
+                        <td style="vertical-align:middle">
+                            <div class="eachproduct">
+                                <img src="~/images/@products[i].Image" />
+                            </div>
+                        </td>
+                        <td>
+                            <p><b>@products[i].ProductName</b> </p>
+                            <p id="desc">@products[i].ProductDescription</p>
+                            <p id="price">Unit Price: <b>$ @products[i].UnitPrice</b></p>
+                            <p>
+                                <b>Quantity</b>
+
+                                <button type="submit" class="minusBtn" id="@i-minusBtn" value="@products[i].UnitPrice" formaction="UpdateQty?cmd=minusBtn&productName=@products[i].ProductName">-</button>
+                                <input type="submit" size="20" style="width:auto;text-align:center" name="itemQty" id="itemQty-@i" value="@quantity[i]" />
+                                <button type="submit" class="addBtn" id="@i-addBtn" value="@products[i].UnitPrice" formaction="UpdateQty?cmd=plusBtn&productName=@products[i].ProductName">+</button>
+                            </p>
+                        </td>
+                        <td>
+                            <p>
+                                <button type="submit" class="removeBtn" id="@i-remove" formaction="UpdateQty?cmd=removeBtn&productName=@products[i].ProductName">Remove</button>
+                            </p>
+                        </td>
+
+                    </tr>
+
+                }
+            }
+        </table>
+        <br>
+    </form>
+}
+
